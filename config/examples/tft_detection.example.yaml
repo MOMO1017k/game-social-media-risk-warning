@@ -1,0 +1,51 @@
+seed: 42
+frequency: 15min
+
+targets:
+  comment_model: comment_pc1
+  post_model: post_pc2
+
+tft:
+  quantiles: [0.1, 0.5, 0.9]
+  hidden_size: 24
+  learning_rate: 0.003
+  dropout: 0.2
+  max_epochs: 300
+  early_stopping_patience: 3
+  validation_ratio: 0.2
+  max_prediction_length: 1
+  models:
+    comment_pc1:
+      max_encoder_length: 48
+    post_pc2:
+      max_encoder_length: 96
+
+cold_start:
+  start: "2025-02-18 00:00:00"
+  end: "2025-02-25 00:00:00"
+  expected_windows: 672
+
+detection:
+  point_k: 5.0
+  point_min_triggers: 4
+  point_roll_window: 8
+  collective_k: 3.0
+  collective_volatility_multiplier: 1.5
+  collective_density_threshold: 0.95
+  collective_window: 288
+  collective_min_periods: 96
+  changepoint_k: 2.0
+  changepoint_window: 2688
+  changepoint_min_periods: 288
+
+adaptive:
+  ca_confirm_windows: 192
+  drift_retrace_windows: 288
+  ca_accumulate_windows: 1344
+  parallel_windows: 288
+  parallel_extension_windows: 480
+  recovery_normal_ratio: 0.85
+  stability_normal_ratio: 0.85
+  cooldown_windows: 672
+  point_relax_windows: 96
+  point_relax_factor: 1.2

@@ -1,0 +1,11 @@
+-r collection.txt
+ImageHash>=4.3
+jieba>=0.42
+matplotlib>=3.8
+numpy>=1.26
+scipy>=1.11
+sentence-transformers>=2.7
+statsmodels>=0.14
+torch>=2.1
+tqdm>=4.66
+transformers>=4.39

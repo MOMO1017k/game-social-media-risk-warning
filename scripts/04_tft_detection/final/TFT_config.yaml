@@ -1,0 +1,151 @@
+# ============================================================
+# TFT + LightGBM 舆情异常检测配置文件
+# ============================================================
+
+# 数据处理配置
+data:
+  # 时间相关
+  time_column: "timestamp"
+  freq: "15min"  # 数据频率：15分钟
+    
+  # 变换方法中不执行的（TFT自带标准化）
+  skip_transforms:
+    - "standardize"
+  
+  # 节假日配置
+  holidays:
+    country: "CN"  # 中国
+    include_weekends: true  # 周末是否算作特殊日
+    
+# 可预知时变变量配置
+known_variables:
+  # 时间特征
+  time_features:
+    - "hour"
+    - "dayofweek"
+    - "month"
+    - "is_weekend"
+    - "is_holiday"
+    - "time_slot"  # 时段：凌晨/早晨/上午/下午/傍晚/晚上/深夜
+  
+  # 运营事件编码方式
+  event_encoding: "label"  # label / onehot
+
+# ============================================================
+# TFT模型配置
+# ============================================================
+tft_models:
+global:
+  time_column: "time_idx"
+  group_ids: ["group_id"]
+  static_categoricals: ["group_id"]
+  
+  # 强制分位数配置: P10, P50, P90
+  quantiles: [0.1, 0.5, 0.9]
+
+# 定义 n 个不同的模型配置
+tft_models:
+
+# ===== 评论+广场PCA模型 =====
+
+  model_comment_pc1:
+    seed: 42
+    target: comment_pc1
+    min_encoder_length: 36
+    max_encoder_length: 108
+    max_prediction_length: 1
+    hidden_size: 20
+    learning_rate: 0.004
+    dropout: 0.15
+  model_post_pc2:
+    seed: 1024
+    target: post_pc2
+    min_encoder_length: 64
+    max_encoder_length: 192
+    max_prediction_length: 1
+    hidden_size: 20
+    learning_rate: 0.004
+    dropout: 0.15
+
+
+# ============================================================
+# 消融实验
+# ============================================================
+#   # 【模型 A：流量脉冲监测】
+#   # 目标：捕捉广场流量突发。
+#   # 特点：短窗口，反应快，主要看流量和基本互动。
+#   model_vol_burst:
+#     seed: 42
+#     target: "total_volume_post"
+#     min_encoder_length: 12      # 3小时
+#     max_encoder_length: 24      # 6小时 (不需要看太久远)
+#     max_prediction_length: 1
+#     hidden_size: 16             # 从32下调，减少显存占用和训练时间
+#     learning_rate: 0.005        # 下调学习率，增加训练稳定性
+#     dropout: 0.1
+# # 【模型 B：水军/模板化行为监测】
+#   # 目标：捕捉图片冗余（刷图）或文本压缩比（刷通稿）。
+#   # 特点：中长窗口，需要对比历史模式来判断当前的重复是否异常。
+#   model_spam_detect:
+#     seed: 1024
+#     target: "vis_abs_redundancy_post" # 或者是 comp_ratio_post
+#     min_encoder_length: 32      # 8小时
+#     max_encoder_length: 48      # 12小时 (半天周期)
+#     max_prediction_length: 1
+#     hidden_size: 16             # 复杂度稍低
+#     learning_rate: 0.01         # 结构化特征可以稍快
+#     dropout: 0.2
+
+#   # 【模型 C：舆论风向/情绪监测】
+#   # 目标：捕捉负面情绪占比或语义漂移。
+#   # 特点：长窗口，情绪通常有惯性，突变需要更长的背景板。
+#   model_sentiment_shift:
+#     seed: 2048
+#     target: "neg_ratio_post"    # 或者是 semantic_shift_post
+#     min_encoder_length: 48      # 12小时
+#     max_encoder_length: 96      # 24小时 (全天周期)
+#     max_prediction_length: 1
+#     hidden_size: 24
+#     learning_rate: 0.001
+#     dropout: 0.3                # 情绪数据噪声大，增加 Dropout
+
+#   # 【模型 D：评论区互动异常】
+#   # 目标：捕捉“只发帖不评论”或“集中攻击”的异常。
+#   # 特点：关注 Gini 系数（用户集中度）。
+#   model_interaction_gini:
+#     seed: 999
+#     target: "gini_comment"
+#     min_encoder_length: 24
+#     max_encoder_length: 48
+#     max_prediction_length: 1
+#     hidden_size: 16
+#     learning_rate: 0.03   
+
+# ===== 复合目标模型 =====
+  # model_energy:
+  #   seed: 42
+  #   target: "feature_energy"
+  #   min_encoder_length: 48      # 12小时
+  #   max_encoder_length: 96      # 24小时（能量有强日周期，lag96=0.52）
+  #   max_prediction_length: 1
+  #   hidden_size: 24
+  #   learning_rate: 0.003
+  #   dropout: 0.2
+
+  # model_pc1:
+  #   seed: 1024
+  #   target: "pc1_score"
+  #   min_encoder_length: 48      # 12小时
+  #   max_encoder_length: 96      # 24小时（lag96=0.51，日周期结构最强）
+  #   max_prediction_length: 1
+  #   hidden_size: 24
+  #   learning_rate: 0.003
+  #   dropout: 0.2
+
+# ============================================================
+# 路径配置
+# ============================================================
+paths:
+  model_dir: "./models"
+  output_dir: "./outputs"
+  cache_dir: "./cache"

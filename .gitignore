@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Credentials and local configuration
+**/*cookie*.json
+**/*cookies*.json
+config/secrets/
+.env
+.env.*
+!config/examples/weibo_cookies.example.json
+
+# Collected or derived data (not for public GitHub)
+data/raw/*
+!data/raw/README.md
+data/interim/
+data/processed/
+all_image_video_urls.txt
+temp_all_post_standart_time.csv
+imgs/
+imgs2/
+
+# Local outputs and logs
+outputs/
+result/
+results/
+logs/
+*.log
+*.parquet
+phash_cache.pkl
+sentiment_model/
+models/downloaded/
+checkpoints/
+lightning_logs/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

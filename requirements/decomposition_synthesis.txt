@@ -1,0 +1,6 @@
+-r feature_engineering.txt
+arch>=6.3
+prophet>=1.1
+pyarrow>=15.0
+scikit-learn>=1.4
+seaborn>=0.13

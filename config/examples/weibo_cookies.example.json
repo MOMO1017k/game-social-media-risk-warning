@@ -1,0 +1,9 @@
+[
+ {
+  "name": "SUB",
+  "value": "<local-cookie-value>",
+  "domain": ".weibo.com",
+  "path": "/",
+  "secure": true
+ }
+]
